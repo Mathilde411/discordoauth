@@ -74,6 +74,7 @@ public class DiscordOAuth {
 		try {
 			Response resp = client.newCall(req).execute();
 			String respBody = resp.body().string();
+			// TODO Add error response
 			return new Gson().fromJson(respBody, OAuthToken.class);
 		} catch (IOException e) {
 			return null;
@@ -98,4 +99,6 @@ public class DiscordOAuth {
 			return null;
 		}
 	}
+	
+	// TODO add other structures
 }
