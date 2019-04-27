@@ -100,5 +100,5 @@ public class DiscordOAuth {
 		}
 	}
 	
-	// TODO add other structures
+	// TODO add other structures 
 }
