@@ -1,4 +1,4 @@
-package fr.bastoup.DiscordOAuth;
+package fr.bastoup.DiscordOAuth.oauth;
 
 public enum Scopes {
 	BOT("bot"),
