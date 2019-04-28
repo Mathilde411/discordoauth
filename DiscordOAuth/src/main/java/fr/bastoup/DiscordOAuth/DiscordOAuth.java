@@ -6,9 +6,11 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
+import fr.bastoup.DiscordOAuth.beans.DiscordError;
 import fr.bastoup.DiscordOAuth.beans.OAuthToken;
 import fr.bastoup.DiscordOAuth.beans.OAuthUser;
 import fr.bastoup.DiscordOAuth.oauth.OAuthConfigurationException;
+import fr.bastoup.DiscordOAuth.oauth.OAuthException;
 import fr.bastoup.DiscordOAuth.oauth.Scopes;
 import okhttp3.HttpUrl;
 import okhttp3.MultipartBody;
@@ -18,6 +20,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class DiscordOAuth {
+	private final Gson gson = new Gson();
 	private String _clientId;
 	private String _clientSecret;
 	private String[] _scopes;
@@ -28,8 +31,10 @@ public class DiscordOAuth {
 	private static final String TOKEN = "api/oauth2/token";
 	private static final String USERS = "api/users/@me";
 
-	public static DiscordOAuth buildDiscordOAuth(String clientId, String clientSecret, Scopes[] scopes, String redirectUri) throws Exception {
-		if(clientId == null || clientId == "" || clientSecret == null || clientSecret == "" || redirectUri == null || redirectUri == "" || scopes.length == 0)
+	public static DiscordOAuth newInstance(String clientId, String clientSecret, Scopes[] scopes, String redirectUri)
+			throws OAuthConfigurationException {
+		if (clientId == null || clientId == "" || clientSecret == null || clientSecret == "" || redirectUri == null
+				|| redirectUri == "" || scopes.length == 0)
 			throw new OAuthConfigurationException("Build information is not complete.");
 		DiscordOAuth oauth = new DiscordOAuth();
 		oauth.setClientId(clientId);
@@ -66,7 +71,7 @@ public class DiscordOAuth {
 		return url.toString();
 	}
 
-	public OAuthToken getOAuthToken(String code) {
+	public OAuthToken getOAuthToken(String code) throws OAuthException {
 		OkHttpClient client = new OkHttpClient();
 		HttpUrl url = new HttpUrl.Builder().scheme("https").host(HOST).addPathSegments(TOKEN).build();
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -80,20 +85,29 @@ public class DiscordOAuth {
 		try {
 			Response resp = client.newCall(req).execute();
 			String respBody = resp.body().string();
-			// TODO Add error response
-			return new Gson().fromJson(respBody, OAuthToken.class);
+			System.out.println(respBody);
+			hasErrors(respBody);
+			return gson.fromJson(respBody, OAuthToken.class);
 		} catch (IOException e) {
 			return null;
 		}
 	}
-	
-	public OAuthToken refreshOAuthToken(String refresh) {
+
+	private void hasErrors(String body) throws OAuthException {
+		DiscordError err = gson.fromJson(body, DiscordError.class);
+		if (err.getError() != null || err.getErrorDescription() != null) {
+			throw new OAuthException(err.getError() + ":" + err.getErrorDescription());
+		}
+	}
+
+	public OAuthToken refreshToken(String refresh) throws OAuthException {
 		OkHttpClient client = new OkHttpClient();
 		HttpUrl url = new HttpUrl.Builder().scheme("https").host(HOST).addPathSegments(TOKEN).build();
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
 				.addFormDataPart("client_id", _clientId).addFormDataPart("client_secret", _clientSecret)
 				.addFormDataPart("grant_type", "refresh_token").addFormDataPart("refresh_token", refresh)
-				.addFormDataPart("redirect_uri", _redirectUri).addFormDataPart("scope", String.join(" ", _scopes)).build();
+				.addFormDataPart("redirect_uri", _redirectUri).addFormDataPart("scope", String.join(" ", _scopes))
+				.build();
 
 		Request req = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
 				.post(body).build();
@@ -101,31 +115,31 @@ public class DiscordOAuth {
 		try {
 			Response resp = client.newCall(req).execute();
 			String respBody = resp.body().string();
-			// TODO Add error response
-			return new Gson().fromJson(respBody, OAuthToken.class);
+			System.out.println(respBody);
+			hasErrors(respBody);
+			return gson.fromJson(respBody, OAuthToken.class);
 		} catch (IOException e) {
 			return null;
 		}
 	}
 
-	public OAuthUser getOAuthUser(OAuthToken token) {
+	public OAuthUser getOAuthUser(OAuthToken token) throws OAuthException {
 		List<String> scps = Arrays.asList(token.getScope().split(" "));
 		if (!(scps.contains(Scopes.IDENTIFY.toString()) || scps.contains(Scopes.EMAIL.toString())))
 			return null;
 		OkHttpClient client = new OkHttpClient();
 		HttpUrl url = new HttpUrl.Builder().scheme("https").host(HOST).addPathSegments(USERS).build();
 
-		Request req = new Request.Builder().url(url).addHeader("Authorization", "Bearer " + token.getAccessToken()).get().build();
+		Request req = new Request.Builder().url(url).addHeader("Authorization", "Bearer " + token.getAccessToken())
+				.get().build();
 
 		try {
 			Response resp = client.newCall(req).execute();
 			String respBody = resp.body().string();
-			System.out.println(respBody);
-			return new Gson().fromJson(respBody, OAuthUser.class);
+			hasErrors(respBody);
+			return gson.fromJson(respBody, OAuthUser.class);
 		} catch (IOException e) {
 			return null;
 		}
 	}
-	
-	// TODO add other structures 
 }
