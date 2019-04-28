@@ -1,6 +1,6 @@
 package fr.bastoup.DiscordOAuth.beans;
 
-public class DiscordError {
+public class ErrorBean {
 	private String error;
 	private String error_description;
 	

@@ -1,11 +1,18 @@
 package fr.bastoup.DiscordOAuth.beans;
 
-public class OAuthToken {
+import java.util.Date;
+
+public class IssuedTokenBean implements Token {
 	private String access_token;
 	private String token_type;
 	private String expires_in;
 	private String refresh_token;
 	private String scope;
+	private long creationDate;
+	
+	public IssuedTokenBean() {
+		this.creationDate = new Date().getTime();
+	}
 	
 	public String getAccessToken() {
 		return access_token;
@@ -46,6 +53,21 @@ public class OAuthToken {
 	public void setScope(String scope) {
 		this.scope = scope;
 	}
+
+	public long getCreationDate() {
+		return creationDate;
+	}
 	
+	public void setCreationDate(long creationDate) {
+		this.creationDate = creationDate;
+	}
 	
+	public Date getExpiery() {
+		return new Date(creationDate + Long.parseLong(expires_in));
+	}
+
+	@Override
+	public String[] getScopes() {
+		return scope.split(" ");
+	}
 }

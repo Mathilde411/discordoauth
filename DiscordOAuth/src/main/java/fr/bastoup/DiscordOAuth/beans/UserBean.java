@@ -1,8 +1,11 @@
 package fr.bastoup.DiscordOAuth.beans;
 
-public class OAuthUser {
+import java.util.List;
+
+public class UserBean implements User{
 	private String id, username, discriminator, avatar, email;
 	private boolean bot, mfa_enabled, verified;
+	private List<Guild> guilds;
 
 	public String getId() {
 		return id;
@@ -31,7 +34,11 @@ public class OAuthUser {
 	public String getAvatar() {
 		return avatar;
 	}
-
+	
+	public String getAvatarURL() {
+		return "https://cdn.discordapp.com/avatars/" + id + "/" + avatar + ".png";
+	}
+	
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
 	}
@@ -52,11 +59,11 @@ public class OAuthUser {
 		this.bot = bot;
 	}
 
-	public boolean isMfa_enabled() {
+	public boolean isMFAEnabled() {
 		return mfa_enabled;
 	}
 
-	public void setMfa_enabled(boolean mfa_enabled) {
+	public void setMFAEnabled(boolean mfa_enabled) {
 		this.mfa_enabled = mfa_enabled;
 	}
 
@@ -66,5 +73,13 @@ public class OAuthUser {
 
 	public void setVerified(boolean verified) {
 		this.verified = verified;
+	}
+
+	public List<Guild> getGuilds() {
+		return guilds;
+	}
+
+	public void setGuilds(List<Guild> guilds) {
+		this.guilds = guilds;
 	}
 }
