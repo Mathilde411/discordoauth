@@ -12,4 +12,8 @@ public interface User {
 	boolean isMFAEnabled();
 	boolean isVerified();
 	List<Guild> getGuilds();
+	String getLocale();
+	Integer getFlags();
+	Integer getPremiumType();
+	List<Connection> getConnections();
 }

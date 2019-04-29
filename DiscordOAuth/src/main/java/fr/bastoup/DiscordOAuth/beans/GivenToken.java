@@ -21,7 +21,7 @@ public class GivenToken implements Token {
 	}
 
 	@Override
-	public Date getExpiery() {
+	public Date getExpiry() {
 		// TODO Auto-generated method stub
 		return expiery;
 	}

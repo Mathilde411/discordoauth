@@ -3,9 +3,11 @@ package fr.bastoup.DiscordOAuth.beans;
 import java.util.List;
 
 public class UserBean implements User{
-	private String id, username, discriminator, avatar, email;
+	private String id, username, discriminator, avatar, email, locale;
 	private boolean bot, mfa_enabled, verified;
+	private Integer flags, premium_type;
 	private List<Guild> guilds;
+	private List<Connection> connections;
 
 	public String getId() {
 		return id;
@@ -81,5 +83,37 @@ public class UserBean implements User{
 
 	public void setGuilds(List<Guild> guilds) {
 		this.guilds = guilds;
+	}
+
+	public String getLocale() {
+		return locale;
+	}
+
+	public void setLocale(String locale) {
+		this.locale = locale;
+	}
+
+	public Integer getFlags() {
+		return flags;
+	}
+
+	public void setFlags(Integer flags) {
+		this.flags = flags;
+	}
+
+	public Integer getPremiumType() {
+		return premium_type;
+	}
+
+	public void setPremiumType(Integer premium_type) {
+		this.premium_type = premium_type;
+	}
+
+	public List<Connection> getConnections() {
+		return connections;
+	}
+
+	public void setConnections(List<Connection> connections) {
+		this.connections = connections;
 	}
 }

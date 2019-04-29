@@ -5,6 +5,6 @@ import java.util.Date;
 public interface Token {
 	public String getAccessToken();
 	public String getRefreshToken();
-	public Date getExpiery();
+	public Date getExpiry();
 	public String[] getScopes();
 }

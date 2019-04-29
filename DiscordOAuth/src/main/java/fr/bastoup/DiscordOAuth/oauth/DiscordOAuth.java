@@ -77,7 +77,7 @@ public class DiscordOAuth {
 	}
 	
 	public OAuthToken getOAuthToken(Token token) throws OAuthException {
-		return new OAuthToken(getLogs(), token, Scope.getScopes(token.getScopes()));
+		return new OAuthToken(getLogs(), token, Scope.getScopes(token.getScopes())); 
 	}
 
 	private void hasErrors(String body) throws OAuthException {

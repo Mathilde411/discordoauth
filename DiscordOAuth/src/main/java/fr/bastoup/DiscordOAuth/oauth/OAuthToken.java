@@ -11,6 +11,8 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import fr.bastoup.DiscordOAuth.beans.AppLogs;
+import fr.bastoup.DiscordOAuth.beans.Connection;
+import fr.bastoup.DiscordOAuth.beans.ConnectionBean;
 import fr.bastoup.DiscordOAuth.beans.ErrorBean;
 import fr.bastoup.DiscordOAuth.beans.Guild;
 import fr.bastoup.DiscordOAuth.beans.GuildBean;
@@ -32,6 +34,7 @@ public class OAuthToken {
 	private static final String TOKEN = "api/oauth2/token";
 	private static final String USERS = "api/users/@me";
 	private static final String GUILDS = "api/users/@me/guilds";
+	private static final String CONNECTIONS = "api/users/@me/connections";
 	
 	private AppLogs logs;
 	private Token token;
@@ -39,7 +42,7 @@ public class OAuthToken {
 	protected OAuthToken(AppLogs logs, Token token) {
 		this.setLogs(logs);
 		this.setToken(token);
-		if(token.getExpiery().compareTo(new Date()) < 0) {
+		if(token.getExpiry().compareTo(new Date()) < 0) {
 			try {
 				refresh();
 			} catch (OAuthException e) {
@@ -90,12 +93,33 @@ public class OAuthToken {
 			hasErrors(respBody);
 			UserBean usr = gson.fromJson(respBody, UserBean.class);
 			usr.setGuilds(logs.getScopes().contains(Scope.GUILDS) ? getUserGuilds() : null);
+			usr.setConnections(logs.getScopes().contains(Scope.GUILDS) ? getConnections() : null);
 			return usr;
 		} catch (IOException e) {
 			return null;
 		}
 	}
+	
+	private List<Connection> getConnections() throws OAuthException {
+		if (!logs.getScopes().contains(Scope.CONNECTIONS))
+			return null;
+		OkHttpClient client = new OkHttpClient();
+		HttpUrl url = new HttpUrl.Builder().scheme("https").host(HOST).addPathSegments(CONNECTIONS).build();
 
+		Request req = new Request.Builder().url(url).addHeader("Authorization", "Bearer " + token.getAccessToken())
+				.get().build();
+
+		try {
+			Response resp = client.newCall(req).execute();
+			String respBody = resp.body().string();
+			hasErrors(respBody);
+			Type listType = new TypeToken<ArrayList<ConnectionBean>>(){}.getType();
+			return gson.fromJson(respBody, listType);
+		} catch (IOException e) {
+			return null;
+		}
+	}
+	
 	private List<Guild> getUserGuilds() throws OAuthException {
 		if (!(logs.getScopes().contains(Scope.GUILDS)))
 			return null;

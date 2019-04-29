@@ -62,7 +62,7 @@ public class IssuedTokenBean implements Token {
 		this.creationDate = creationDate;
 	}
 	
-	public Date getExpiery() {
+	public Date getExpiry() {
 		return new Date(creationDate + Long.parseLong(expires_in));
 	}
 
