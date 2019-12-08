@@ -38,7 +38,7 @@ public class UserBean implements User{
 	}
 	
 	public String getAvatarURL() {
-		return "https://cdn.discordapp.com/avatars/" + id + "/" + avatar + ".png";
+		return avatar != null ? "https://cdn.discordapp.com/avatars/" + id + "/" + avatar + ".png" : "https://cdn.discordapp.com/embed/avatars/" + (Integer.parseInt(discriminator) % 5) + ".png";
 	}
 	
 	public void setAvatar(String avatar) {
